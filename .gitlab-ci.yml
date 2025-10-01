@@ -1,0 +1,18 @@
+# Node Image for docker on which code will execute
+image: node:latest
+
+# This is the stages / task to perfom in jobss
+stages:
+  - deploy
+
+# Job Two for deploy build to S3
+deploy_master:
+  image: python:latest
+  stage: deploy
+  before_script:
+    - pip install awscli
+  script:
+    - aws configure list
+    - aws s3 sync ./ s3://insumoswebv2/ --acl=public-read --delete
+    - aws cloudfront create-invalidation --distribution-id EZQ4VYKP1X36A --paths "/*"
+  only: ['master']
